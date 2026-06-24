@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
+
+</head>
+
+<body>
+
+<h2 id="status">Carregando...</h2>
+
+<video id="webcam"
+width="320"
+height="240"
+autoplay
+playsinline>
+</video>
+
+<script>
+
+const URL =
+"https://teachablemachine.withgoogle.com/models/rjRH0wRV4/";
+
+let model;
+
+async function iniciar(){
+
+model = await tmImage.load(
+URL + "model.json",
+URL + "metadata.json"
+);
+
+const video =
+document.getElementById("webcam");
+
+const stream =
+await navigator.mediaDevices.getUserMedia({
+video:true
+});
+
+video.srcObject = stream;
+
+setInterval(prever,500);
+
+}
+
+async function prever(){
+
+const video =
+document.getElementById("webcam");
+
+const pred =
+await model.predict(video);
+
+let classe="";
+let prob=0;
+
+for(let i=0;i<pred.length;i++){
+
+if(pred[i].probability>prob){
+
+prob=pred[i].probability;
+classe=pred[i].className;
+
+}
+
+}
+
+document.getElementById("status").innerHTML =
+classe;
+
+window.AppInventor.setWebViewString(
+classe
+);
+
+}
+
+iniciar();
+
+</script>
+
+</body>
+</html>
